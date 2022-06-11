@@ -1,3 +1,4 @@
+import ast
 from src.drives.kafka import Kafka
 from src.drives.enums import Topics
 from src.drives.kafka_template import AbsctractKafka
@@ -11,11 +12,11 @@ def notify(notice):
 
 def save(notice):
     print(f'Saving notice...')
-    notify(notice)
 
 
 def exec(message):
-    print('Received message: {}'.format(message.value().decode('utf-8')))
+    notice = ast.literal_eval(message.value().decode('utf-8'))
+    print('Received message: {}'.format(notice['title']))
     save(message)
 
 

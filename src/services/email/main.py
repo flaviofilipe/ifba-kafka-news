@@ -1,10 +1,12 @@
+import ast
 from src.drives.kafka import Kafka
 from src.drives.enums import Topics
 from src.drives.kafka_template import AbsctractKafka
 
 
 def exec(message):
-    print('Received message: {}'.format(message.value().decode('utf-8')))
+    notice = ast.literal_eval(message.value().decode('utf-8'))
+    print(f'[Notify] New Notice: {notice["title"]}')
 
 
 def handler(queue: AbsctractKafka):
