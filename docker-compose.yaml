@@ -12,8 +12,6 @@ services:
     image: confluentinc/cp-kafka:latest
     container_name: broker
     ports:
-    # To learn about configuring Kafka for access across networks see
-    # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
       - "9092:9092"
     depends_on:
       - zookeeper
@@ -25,3 +23,15 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  
+  ff-database:
+    image: postgres
+    container_name: ff-database
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+      - ./database/data:/var/lib/postgresql/data
+      - ./database/notices.sql:/docker-entrypoint-initdb.d/notices.sql
+      - ./database/docker_config/init_db.sh:/docker-entrypoint-initdb.d/init_db.sh
+    env_file:
+      - .env
