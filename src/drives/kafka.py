@@ -25,19 +25,22 @@ class Kafka(AbsctractKafka):
 
     def send_message(self, topic: Topics, message: str):
         print('Sending message...')
+        print(f'Topic: {topic.value}')
 
-        self.producer.poll(0)
         self.producer.produce(topic.value, message.encode(
             'utf-8'), callback=self.delivery_report)
+        self.producer.poll(1)
         print('End sending message...')
 
     def consume_from(self, topic: Topics, exec):
         self.consumer.subscribe([topic.value])
+        print(f'Topic: {topic.value}')
 
         while True:
             msg = self.consumer.poll(1.0)
 
             if msg is None:
+                print('Mensage is none...')
                 continue
             if msg.error():
                 print("Consumer error: {}".format(msg.error()))

@@ -1,8 +1,6 @@
 from src.drives.kafka import Kafka
 from src.drives.enums import Topics
 from src.drives.kafka_template import AbsctractKafka
-from src.services.crawler.mock_notices import NOTICES
-import json
 import requests
 from bs4 import BeautifulSoup
 
@@ -36,6 +34,7 @@ def get_posts(start=1) -> list:
     return posts
 
 def send_to_queue(queue: AbsctractKafka, posts):
+    print('Sending to queue...')
     queue.send_message(Topics.NEWS, str(posts))
 
 
@@ -45,8 +44,6 @@ def handler(queue: AbsctractKafka):
     for post in posts:
         print(post)
         send_to_queue(queue, post)
-    # for notice in NOTICES:
-    #     queue.send_message(Topics.NEWS, str(notice))
 
 
 if __name__ == '__main__':

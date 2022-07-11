@@ -2,7 +2,7 @@ import ast
 from src.drives.kafka import Kafka
 from src.drives.enums import Topics
 from src.drives.kafka_template import AbsctractKafka
-from src.services.notices.repository import create_notice, find_notice_by_title
+from src.repository import create_notice, find_notice_by_title
 from src.utils import format_date
 
 
@@ -25,12 +25,17 @@ def save(message):
 
 
 def exec(message):
-    notice = ast.literal_eval(message.value().decode('utf-8'))
-    print('Received message: {}'.format(notice['title']))
-    save(message)
+    print('Exec...')
+    try:
+        notice = ast.literal_eval(message.value().decode('utf-8'))
+        print('Received message: {}'.format(notice['title']))
+        save(message)
+    except Exception as err:
+        print('Error to save message: {}'.format(message.value()))
 
 
 def handler(queue: AbsctractKafka):
+    print('handler...')
     queue.consume_from(topic=Topics.NEWS, exec=exec)
 
 
