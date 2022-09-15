@@ -1,8 +1,11 @@
+import logging
 from confluent_kafka import Producer
 from confluent_kafka import Consumer
 from src.drives.enums import Topics
 
 from src.drives.kafka_template import AbsctractKafka
+
+log = logging.getLogger(__name__)
 
 
 class Kafka(AbsctractKafka):
@@ -18,32 +21,32 @@ class Kafka(AbsctractKafka):
 
     def delivery_report(self, err, msg):
         if err is not None:
-            print('Message delivery failed: {}'.format(err))
+            log.error('Message delivery failed: {}'.format(err))
         else:
-            print('Message delivered to {} [{}]'.format(
+            log.info('Message delivered to {} [{}]'.format(
                 msg.topic(), msg.partition()))
 
     def send_message(self, topic: Topics, message: str):
-        print('Sending message...')
-        print(f'Topic: {topic.value}')
+        log.info('Sending message...')
+        log.info(f'Topic: {topic.value}')
 
         self.producer.produce(topic.value, message.encode(
             'utf-8'), callback=self.delivery_report)
         self.producer.poll(1)
-        print('End sending message...')
+        log.info('End sending message...')
 
     def consume_from(self, topic: Topics, exec):
         self.consumer.subscribe([topic.value])
-        print(f'Topic: {topic.value}')
+        log.info(f'Topic: {topic.value}')
 
         while True:
             msg = self.consumer.poll(1.0)
 
             if msg is None:
-                print('Mensage is none...')
+                log.info('Mensage is none...')
                 continue
             if msg.error():
-                print("Consumer error: {}".format(msg.error()))
+                log.info("Consumer error: {}".format(msg.error()))
                 continue
 
             exec(msg)
